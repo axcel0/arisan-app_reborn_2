@@ -16,7 +16,6 @@ class DataKocok extends StatefulWidget {
 
   @override
   State<DataKocok> createState() => _DataKocokState();
-
 }
 
 class _DataKocokState extends State<DataKocok> {
@@ -72,7 +71,7 @@ class _DataKocokState extends State<DataKocok> {
         ConfettiWidget(
           confettiController: widget.confetti,
           blastDirectionality: BlastDirectionality.explosive,
-          shouldLoop: false,
+          shouldLoop: true, // Make the confetti continuously fall
           colors: const [
             Colors.green,
             Colors.blue,
@@ -81,12 +80,16 @@ class _DataKocokState extends State<DataKocok> {
             Colors.purple,
             Colors.yellow,
             Colors.red,
+            Colors.teal, // Add more colors
+            Colors.indigo,
           ],
-          //set emission count
+          // Increase the number of particles
           numberOfParticles: 10,
-          emissionFrequency: 0.05,
-          maxBlastForce: 100,
-          minBlastForce: 80,
+          // Increase the emission frequency
+          emissionFrequency: 0.1,
+          // Modify the blast force
+          maxBlastForce: 150,
+          minBlastForce: 100,
         )
       ]
     );
