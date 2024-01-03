@@ -143,7 +143,7 @@ class _DataPesertaState extends State<DataPeserta> {
     );
   }
 
-  AlertDialog showEditDialog(String editId, String editNama) {
+  StatefulBuilder showEditDialog(String editId, String editNama) {
     var namaController = TextEditingController();
     var nikController = TextEditingController();
 
@@ -153,129 +153,132 @@ class _DataPesertaState extends State<DataPeserta> {
     nikController.text = editId;
     namaController.text = editNama;
 
-    return AlertDialog(
-      backgroundColor: Theme.of(context).colorScheme.brightness == Brightness.light ? Colors.white : Theme.of(context).cardColor,
-      title: SizedBox(
-        height: 25,
-        child: Text("Edit Data", textAlign: TextAlign.center, style: TextStyle(color: Theme.of(context).colorScheme.brightness == Brightness.light ? Theme.of(context).primaryTextTheme.titleMedium!.color : Theme.of(context).primaryTextTheme.titleMedium!.color,)),
-      ),
-      content: SizedBox(
-        height: 200,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              alignment: Alignment.centerLeft,
-              //change font family of text
-              child: Text("Nama", style: TextStyle(color: Theme.of(context).primaryTextTheme.titleMedium!.color)),
+    return StatefulBuilder(
+      builder: (BuildContext context, StateSetter setState) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.brightness == Brightness.light ? Colors.white : Theme.of(context).cardColor,
+          title: SizedBox(
+            height: 25,
+            child: Text("Edit Data", textAlign: TextAlign.center, style: TextStyle(color: Theme.of(context).colorScheme.brightness == Brightness.light ? Theme.of(context).primaryTextTheme.titleMedium!.color : Theme.of(context).primaryTextTheme.titleMedium!.color,)),
+          ),
+          content: SizedBox(
+            height: 200,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  alignment: Alignment.centerLeft,
+                  child: Text("Nama", style: TextStyle(color: Theme.of(context).primaryTextTheme.titleMedium!.color)),
+                ),
+                TextField(
+                  style: TextStyle(color: Theme.of(context).primaryTextTheme.titleMedium!.color),
+                  controller: namaController,
+                  decoration: InputDecoration(
+                    hintText: "Masukkan Nama",
+                    hintStyle: TextStyle(color: Theme.of(context).primaryTextTheme.titleMedium!.color),
+                  ),
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  child: Text("NIK", style: TextStyle(color: Theme.of(context).primaryTextTheme.titleMedium!.color)),
+                ),
+                TextField(
+                  style: TextStyle(color: Theme.of(context).primaryTextTheme.titleMedium!.color),
+                  controller: nikController,
+                  decoration: InputDecoration(
+                    hintText: "Masukkan NIK",
+                    hintStyle: TextStyle(color: Theme.of(context).primaryTextTheme.titleMedium!.color),
+                  ),
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                ),
+              ],
             ),
-            TextField(
-              style: TextStyle(color: Theme.of(context).primaryTextTheme.titleMedium!.color),
-              controller: namaController,
-              decoration: InputDecoration(
-                hintText: "Masukkan Nama",
-                //color of hint text
-                hintStyle: TextStyle(color: Theme.of(context).primaryTextTheme.titleMedium!.color),
-              ),
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            Container(
-              alignment: Alignment.centerLeft,
-              child: Text("NIK", style: TextStyle(color: Theme.of(context).primaryTextTheme.titleMedium!.color)),
-            ),
-            TextField(
-              style: TextStyle(color: Theme.of(context).primaryTextTheme.titleMedium!.color),
-              controller: nikController,
-              decoration: InputDecoration(
-                hintText: "Masukkan NIK",
-                hintStyle: TextStyle(color: Theme.of(context).primaryTextTheme.titleMedium!.color),
-              ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: (namaController.text == oldNama && nikController.text == oldId)
+                  ? null
+                  : () {
+                if (namaController.text.isEmpty || nikController.text.isEmpty) {
+                  Navigator.of(context).pop();
+                  Flushbar(
+                    backgroundColor: Colors.red,
+                    icon: const Icon(
+                      Icons.info_outline,
+                      color: Colors.white,
+                    ),
+                    title: "Warning!",
+                    message: "Data tidak boleh ada yang kosong",
+                    duration: const Duration(seconds: 2),
+                  ).show(context);
+                } else if(pesertaList.any((element) => element.idPeserta == nikController.text && element.idPeserta != oldId)){
+                  Navigator.of(context).pop();
+                  Flushbar(
+                    backgroundColor: Colors.red,
+                    icon: const Icon(
+                      Icons.info_outline,
+                      color: Colors.white,
+                    ),
+                    title: "Warning!",
+                    message: "NIK sudah ada",
+                    duration: const Duration(seconds: 2),
+                  ).show(context);
+                } else if(nikController.text.contains(RegExp(r'[a-zA-Z]'))){
+                  Navigator.of(context).pop();
+                  Flushbar(
+                    backgroundColor: Colors.red,
+                    icon: const Icon(
+                      Icons.info_outline,
+                      color: Colors.white,
+                    ),
+                    title: "Warning!",
+                    message: "NIK harus berupa angka",
+                    duration: const Duration(seconds: 2),
+                  ).show(context);
+                } else {
+                  pesertaBloc.add(EditPeserta(nikController.text, namaController.text, oldId, oldNama));
+                  pesertaBloc.add(EditPemenang(nikController.text, namaController.text, oldId, oldNama));
+
+                  var index = pesertaList.indexWhere((element) => element.idPeserta == oldId && element.namaPeserta == oldNama);
+                  if (index != -1) {
+                    pesertaList[index] = NamaPeserta(idPeserta: nikController.text, namaPeserta: namaController.text);
+                  }
+
+                  updateSharedPreferences(pesertaList);
+
+                  if(pemenangList.any((element) => element.idPeserta == oldId)){
+                    var indexPemenang = pemenangList.indexWhere((element) => element.idPeserta == oldId && element.namaPeserta == oldNama);
+                    if (indexPemenang != -1) {
+                      pemenangList[indexPemenang] = NamaPeserta(idPeserta: nikController.text, namaPeserta: namaController.text);
+                    }
+                  }
+
+                  Navigator.of(context).pop();
+                  Flushbar(
+                    backgroundColor: Colors.green,
+                    icon: const Icon(
+                      Icons.info_outline,
+                      color: Colors.white,
+                    ),
+                    title: "Success!",
+                    message: "Data berhasil diubah",
+                    duration: const Duration(seconds: 2),
+                  ).show(context);
+                }
+              },
+              child: Text("Save", style: TextStyle(color: Theme.of(context).colorScheme.brightness == Brightness.light ? Theme.of(context).colorScheme.primary : Colors.lightBlue,)),
             ),
           ],
-        ),
-      ),
-      actions: [
-        ElevatedButton(onPressed: () {
-          //check if the textfield is empty or not
-          setState(() {
-            if (namaController.text.isEmpty || nikController.text.isEmpty) {
-              Navigator.of(context).pop();
-              Flushbar(
-                backgroundColor: Colors.red,
-                icon: const Icon(
-                  Icons.info_outline,
-                  color: Colors.white,
-                ),
-                title: "Warning!",
-                message: "Data tidak boleh ada yang kosong",
-                duration: const Duration(seconds: 2),
-              ).show(context);
-            } else {
-              //if data already exist, notify user using snackbar from flushbar
-              if(pesertaList.any((element) => element.idPeserta == nikController.text && element.idPeserta != oldId)){
-                Navigator.of(context).pop();
-                Flushbar(
-                  backgroundColor: Colors.red,
-                  icon: const Icon(
-                    Icons.info_outline,
-                    color: Colors.white,
-                  ),
-                  title: "Warning!",
-                  message: "NIK sudah ada",
-                  duration: const Duration(seconds: 2),
-                ).show(context);
-              }//NIK must be numeric
-              else if(nikController.text.contains(RegExp(r'[a-zA-Z]'))){
-                Navigator.of(context).pop();
-                Flushbar(
-                  backgroundColor: Colors.red,
-                  icon: const Icon(
-                    Icons.info_outline,
-                    color: Colors.white,
-                  ),
-                  title: "Warning!",
-                  message: "NIK harus berupa angka",
-                  duration: const Duration(seconds: 2),
-                ).show(context);
-              }
-              else{
-
-                pesertaBloc.add(EditPeserta(nikController.text, namaController.text, oldId, oldNama));
-                pesertaBloc.add(EditPemenang(nikController.text, namaController.text, oldId, oldNama));
-
-                var index = pesertaList.indexWhere((element) => element.idPeserta == oldId && element.namaPeserta == oldNama);
-                if (index != -1) {
-                  pesertaList[index] = NamaPeserta(idPeserta: nikController.text, namaPeserta: namaController.text);
-                }
-
-                updateSharedPreferences(pesertaList);
-
-                if(pemenangList.any((element) => element.idPeserta == oldId)){
-                  var indexPemenang = pemenangList.indexWhere((element) => element.idPeserta == oldId && element.namaPeserta == oldNama);
-                  if (indexPemenang != -1) {
-                    pemenangList[indexPemenang] = NamaPeserta(idPeserta: nikController.text, namaPeserta: namaController.text);
-                  }
-                }
-                
-                Navigator.of(context).pop();
-                Flushbar(
-                  backgroundColor: Colors.green,
-                  icon: const Icon(
-                    Icons.info_outline,
-                    color: Colors.white,
-                  ),
-                  title: "Success!",
-                  message: "Data berhasil diubah",
-                  duration: const Duration(seconds: 2),
-                ).show(context);
-              }
-            }
-          });
-        },
-            child: Text("Save", style: TextStyle(color: Theme.of(context).colorScheme.brightness == Brightness.light ? Theme.of(context).colorScheme.primary : Colors.lightBlue,))),
-      ],
+        );
+      },
     );
   }
 
