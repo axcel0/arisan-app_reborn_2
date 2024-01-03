@@ -409,6 +409,9 @@ class _DataPesertaState extends State<DataPeserta> {
     List<Map<String, dynamic>> jsonList = pesertaList.map((obj) => obj.toJson()).toList();
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList("PesertaList", jsonList.map((e) => jsonEncode(e)).toList());
+
+    // Dispatch an event to update the state
+    pesertaBloc.add(UpdatePesertaList(pesertaList));
   }
 
   Future<void> updatePemenangSharedPreferences(List<NamaPeserta> listPeserta) async {

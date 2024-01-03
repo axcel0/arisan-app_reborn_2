@@ -22,6 +22,11 @@ class ShowPemenangInitial extends PesertaState {
 
   ShowPemenangInitial(this.newIdPeserta, this.newNamaPeserta);
 }
+class UpdatePesertaList extends PesertaEvent {
+  final List<NamaPeserta> pesertaList;
+
+  UpdatePesertaList(this.pesertaList);
+}
 
 class ChangeThemeState extends PesertaState {
   final bool isDark;

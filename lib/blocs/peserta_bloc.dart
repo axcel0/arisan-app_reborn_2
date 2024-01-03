@@ -26,6 +26,11 @@ class PesertaBloc extends Bloc<PesertaEvent, PesertaState> {
     on<ShowPeserta>(_showPeserta);
     on<ShowPemenang>(_showPemenang);
     on<ChangeTheme>(_changeTheme);
+    on<UpdatePesertaList>(_updatePesertaList);
+  }
+  Future<void> _updatePesertaList(UpdatePesertaList event, Emitter<PesertaState> emit) async {
+    daftarPeserta = event.pesertaList;
+    emit(ListPesertaInitial(daftarPeserta));
   }
 
   Future<void> _showPemenang(ShowPemenang event, Emitter<PesertaState> emit) async {
