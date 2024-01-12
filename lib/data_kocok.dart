@@ -277,7 +277,7 @@ class _DataKocokState extends State<DataKocok> {
 
   void loadData() async {
     listdataPemenang = await loadSharedPreferences();
-    listdataPeserta = await loadPesertaSharedPreferences();
+    listdataPeserta = await loadSharedPreferences();
     for (var element in listdataPemenang) {
       pesertaBloc.add(LoadPemenang(element.idPeserta, element.namaPeserta));
     }
@@ -296,12 +296,6 @@ class _DataKocokState extends State<DataKocok> {
     return jsonList.map((e) => NamaPeserta.fromJson(jsonDecode(e))).toList();
   }
 
-  Future<List<NamaPeserta>> loadPesertaSharedPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonList = prefs.getStringList("PesertaList") ?? [];
-    return jsonList.map((e) => NamaPeserta.fromJson(jsonDecode(e))).toList();
-  }
-
   Future<void> saveSharedPreferences(List<NamaPeserta> listPemenang, String newId, String newName) async {
     listPemenang.add(NamaPeserta(idPeserta: newId, namaPeserta: newName));
     List<Map<String, dynamic>> jsonList = listPemenang.map((obj) => obj.toJson()).toList();
@@ -315,8 +309,8 @@ class _DataKocokState extends State<DataKocok> {
   }
 
   loadDataPeserta() async {
-    listdataPeserta = await loadPesertaSharedPreferences();
-    print("listdataPeserta : ${listdataPeserta.length}");
+    listdataPeserta = await loadSharedPreferences();
+    print("list dataPeserta : ${listdataPeserta.length}");
   }
 
 }

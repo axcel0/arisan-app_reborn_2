@@ -9,7 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/peserta_bloc.dart';
 
 class DataPeserta extends StatefulWidget {
-  const DataPeserta({super.key});
+  const DataPeserta({Key? key}) : super(key: key);
 
   @override
   State<DataPeserta> createState() => _DataPesertaState();

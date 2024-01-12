@@ -41,7 +41,7 @@ class PesertaBloc extends Bloc<PesertaEvent, PesertaState> {
     emit(ListPesertaInitial(daftarPeserta));
   }
 
-  Future<void> _addNewPeserta(AddNewPeserta event, Emitter<PesertaState> emit) async {
+  void _addNewPeserta(AddNewPeserta event, Emitter<PesertaState> emit) {
     daftarPeserta.addAll([NamaPeserta(idPeserta: event.newIdPeserta, namaPeserta: event.newNamaPeserta)]);
     emit(ListPesertaInitial(daftarPeserta));
   }
